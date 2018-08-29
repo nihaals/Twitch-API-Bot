@@ -166,7 +166,7 @@ class Twitch:
             await ctx.send(f"You do not have the role `{roleName}`.")
             return
 
-        await ctx.member.remove_roles(role)
+        await ctx.author.remove_roles(role)
         await ctx.send(":thumbsup:")
 
 
