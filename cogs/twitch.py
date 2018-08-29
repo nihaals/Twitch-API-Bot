@@ -145,7 +145,11 @@ class Twitch:
             await ctx.send(f"Can't find a role with the name `{roleName}`. Run `list` to see a list of roles.")
             return
 
-        await ctx.member.add_roles(role)
+        if role in ctx.author.roles:
+            await ctx.send(f"You already have the role `{roleName}`.")
+            return
+
+        await ctx.author.add_roles(role)
         await ctx.send(":thumbsup:")
 
     @rank.command(name="leave")
