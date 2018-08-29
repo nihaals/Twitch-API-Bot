@@ -79,34 +79,34 @@ async def twitchSort(ctx, *, message: discord.Message = None):
             if currentPos != correctPos:
                 await role.edit(position=correctPos)
 
-    if message:
-        await message.edit(content="Checking channel matches...")
-
-    roleNames = [r.name for r in roles]
-    roleNamesLowered = [rn.lower() for rn in roleNames]
-
-    for channel in allLangChannels:
-        roleName = f"{channel.category.name}: {channel.name}"
-        if roleName not in roleNames:
-            if roleName not in roleNamesLowered:
-                await ctx.send(f"No role for `{channel.name}` ({channel.mention}).")
-
-            else:
-                await ctx.send(f"Wrong capitalisation for role for `{channel.name}` ({channel.mention}).")
-
-    if message:
-        await message.edit(content="Checking role matches...")
-
-    allChannelNamesRoles = [f"{c.category.name}: {c.name}" for c in allLangChannels]
-    allChannelNamesRolesLowered = [rn.lower() for rn in allChannelNamesRoles]
-
-    for role in roles:
-        if role.name not in allChannelNamesRoles:
-            if role.name not in allChannelNamesRolesLowered:
-                await ctx.send(f"No channel for `{role.name}` ({role.id})")
-
-            else:
-                pass  # Already checked above
+    # if message:
+    #     await message.edit(content="Checking channel matches...")
+    #
+    # roleNames = [r.name for r in roles]
+    # roleNamesLowered = [rn.lower() for rn in roleNames]
+    #
+    # for channel in allLangChannels:
+    #     roleName = f"{channel.category.name}: {channel.name}"
+    #     if roleName not in roleNames:
+    #         if roleName not in roleNamesLowered:
+    #             await ctx.send(f"No role for `{channel.name}` ({channel.mention}).")
+    #
+    #         else:
+    #             await ctx.send(f"Wrong capitalisation for role for `{channel.name}` ({channel.mention}).")
+    #
+    # if message:
+    #     await message.edit(content="Checking role matches...")
+    #
+    # allChannelNamesRoles = [f"{c.category.name}: {c.name}" for c in allLangChannels]
+    # allChannelNamesRolesLowered = [rn.lower() for rn in allChannelNamesRoles]
+    #
+    # for role in roles:
+    #     if role.name not in allChannelNamesRoles:
+    #         if role.name not in allChannelNamesRolesLowered:
+    #             await ctx.send(f"No channel for `{role.name}` ({role.id})")
+    #
+    #         else:
+    #             pass  # Already checked above
 
     if message:
         await message.edit(content=":thumbsup:")
