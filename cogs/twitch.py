@@ -124,6 +124,47 @@ class Twitch:
 
         await ctx.send(":thumbsup:")
 
+    @commands.group(invoke_without_command=True, aliases=["role", "roles", "ranks"])
+    async def rank(self, ctx):
+        helpText = (await self.bot.formatter.format_help_for(ctx, self.rank))[0]
+        await ctx.send(helpText)
+
+    @rank.command(name="list")
+    async def _list(self, ctx):
+        roles = getLibRoles(ctx.guild)
+
+        await ctx.send("All available roles are: `" + "`, `".join([r.name for r in roles]) + "`")
+
+    @rank.command(name="join")
+    async def _join(self, ctx, roleName):
+        roles = getLibRoles(ctx.guild)
+
+        role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
+
+        if not role:
+            await ctx.send(f"Can't find a role with the name `{roleName}`. Run `list` to see a list of roles.")
+            return
+
+        await ctx.member.add_roles(role)
+        await ctx.send(":thumbsup:")
+
+    @rank.command(name="leave")
+    async def _leave(self, ctx, roleName):
+        roles = getLibRoles(ctx.guild)
+
+        role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
+
+        if not role:
+            await ctx.send(f"Can't find a role with the name `{roleName}`. Run `list` to see a list of roles.")
+            return
+
+        if role not in ctx.author.roles:
+            await ctx.send(f"You do not have the role `{roleName}`.")
+            return
+
+        await ctx.member.remove_roles(role)
+        await ctx.send(":thumbsup:")
+
 
 def setup(bot):
     bot.add_cog(Twitch(bot))
