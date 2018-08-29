@@ -136,7 +136,7 @@ class Twitch:
         await ctx.send("All available roles are: `" + "`, `".join([r.name for r in roles]) + "`")
 
     @rank.command(name="join")
-    async def _join(self, ctx, roleName):
+    async def _join(self, ctx, *, roleName):
         roles = getLibRoles(ctx.guild)
 
         role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
@@ -149,7 +149,7 @@ class Twitch:
         await ctx.send(":thumbsup:")
 
     @rank.command(name="leave")
-    async def _leave(self, ctx, roleName):
+    async def _leave(self, ctx, *, roleName):
         roles = getLibRoles(ctx.guild)
 
         role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
