@@ -19,10 +19,13 @@ async def twitchSort(ctx, *, message: discord.Message = None):
     for langCategory in langCategories:
         langChannels = [channel for channel in langCategory.channels if isinstance(channel, discord.TextChannel)]
         allLangChannels.extend(langChannels)
-        sortedOrder = sorted(langChannels, key=lambda c: c.name.lower())  # Sorted list of channels
-        for channel in langChannels:
-            if sortedOrder.index(channel) != channel.position:
-                await channel.edit(position=sortedOrder.index(channel))  # Change position to match sorted order
+
+        sortedOrder = list(sorted(langChannels, key=lambda c: c.name.lower()))  # Sorted list of channels
+
+        if sortedOrder != langChannels:  # Needs to be sorted
+            for channel in langChannels:
+                if sortedOrder.index(channel) != channel.position:
+                    await channel.edit(position=sortedOrder.index(channel))  # Change position to match sorted order
 
     # Sort categories
     if message:
@@ -43,9 +46,10 @@ async def twitchSort(ctx, *, message: discord.Message = None):
             sortedLangCategories = sorted(langCategories, key=lambda c: c.name)
             sortedOrder.extend(sortedLangCategories)
 
-    for category in langCategories:
-        if sortedOrder.index(category) != category.position:
-            await category.edit(position=sortedOrder.index(category))
+    if sortedOrder != ctx.guild.categories:
+        for category in langCategories:
+            if sortedOrder.index(category) != category.position:
+                await category.edit(position=sortedOrder.index(category))
 
     # Sort roles
     roles = getLibRoles(ctx.guild)
@@ -64,7 +68,7 @@ async def twitchSort(ctx, *, message: discord.Message = None):
     if message:
         await message.edit(content="Sorting roles...")
 
-    sortedRoles = sorted(roles, key=lambda r: r.name.lower())
+    sortedRoles = list(sorted(roles, key=lambda r: r.name.lower()))
 
     if sortedRoles != roles:
         if message:
