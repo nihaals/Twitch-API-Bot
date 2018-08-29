@@ -6,20 +6,28 @@ import cogs.utils.checks as checks
 import asyncio
 
 
-async def twitchSort(ctx):
+async def twitchSort(ctx, *, message: discord.Message = None):
     """Sorts all the categories and channels."""
     categoryBlacklist = ["Info", "Main", "", "Other", "Admin"]
     langCategories = [c for c in ctx.guild.categories if c.name not in categoryBlacklist]
+    allLangChannels = []
 
     # Sort channels in each category
+    if message:
+        await message.edit(content="Sorting channels...")
+
     for langCategory in langCategories:
         langChannels = [channel for channel in langCategory.channels if isinstance(channel, discord.TextChannel)]
+        allLangChannels.extend(langChannels)
         sortedOrder = sorted(langChannels, key=lambda c: c.name.lower())  # Sorted list of channels
         for channel in langChannels:
             if sortedOrder.index(channel) != channel.position:
                 await channel.edit(position=sortedOrder.index(channel))  # Change position to match sorted order
 
     # Sort categories
+    if message:
+        await message.edit(content="Sorting categories...")
+
     sortedOrder = []
     for categoryName in categoryBlacklist:
         if categoryName:
@@ -40,8 +48,71 @@ async def twitchSort(ctx):
             await category.edit(position=sortedOrder.index(category))
 
     # Sort roles
+    roles = getLibRoles(ctx.guild)
 
-    await ctx.send(":thumbsup:")
+    # Check permissions
+    if message:
+        await message.edit(content="Checking role permissions...")
+
+    emptyPerms = discord.Permissions.none()
+
+    for role in roles:
+        if role.permissions.value != 0:
+            await role.edit(permissions=emptyPerms)
+
+    # Sort roles
+    if message:
+        await message.edit(content="Sorting roles...")
+
+    sortedRoles = sorted(roles, key=lambda r: r.name.lower())
+
+    if sortedRoles != roles:
+        if message:
+            await message.edit(content="Moving roles...")
+
+        closeRoleTagPos = discord.utils.get(ctx.guild.roles, name="</roles>").position  # TODO Might be None and error
+
+        for role in roles:
+            currentPos = role.position
+            correctPos = closeRoleTagPos + len(roles) - sortedRoles.index(role)
+
+            if currentPos != correctPos:
+                await role.edit(position=correctPos)
+
+    if message:
+        await message.edit(content="Checking channel matches...")
+
+    roleNames = [r.name for r in roles]
+    roleNamesLowered = [rn.lower() for rn in roleNames]
+
+    for channel in allLangChannels:
+        roleName = f"{channel.category.name}: {channel.name}"
+        if roleName not in roleNames:
+            if roleName not in roleNamesLowered:
+                await ctx.send(f"No role for `{channel.name}` ({channel.mention}).")
+
+            else:
+                await ctx.send(f"Wrong capitalisation for role for `{channel.name}` ({channel.mention}).")
+
+    if message:
+        await message.edit(content="Checking role matches...")
+
+    allChannelNamesRoles = [f"{c.category.name}: {c.name}" for c in allLangChannels]
+    allChannelNamesRolesLowered = [rn.lower() for rn in allChannelNamesRoles]
+
+    for role in roles:
+        if role.name not in allChannelNamesRoles:
+            if role.name not in allChannelNamesRolesLowered:
+                await ctx.send(f"No channel for `{role.name}` ({role.id})")
+
+            else:
+                pass  # Already checked above
+
+    if message:
+        await message.edit(content=":thumbsup:")
+
+    else:
+        await ctx.send(":thumbsup:")
 
 
 def getLibRoles(guild: discord.Guild):
@@ -99,44 +170,45 @@ class Twitch:
 
         else:
             pos = closeRoleTag.position
-            await role.edit(position=pos-1)
+            await role.edit(position=pos+1)
 
-        await twitchSort(ctx)
+        m = await ctx.send("Starting sorting...")
 
-    @commands.command()
+        await twitchSort(ctx, message=m)
+
+    @commands.command(aliases=["sort"])
     @checks.has_permissions_owner(administrator=True)
     async def twitchsort(self, ctx):
         """Sorts all the categories and channels."""
-        await twitchSort(ctx)
+        m = await ctx.send("Starting sorting...")
+        await twitchSort(ctx, message=m)
 
     @commands.command(aliases=["twitchremoveroles", "trr"])
     @checks.has_permissions_owner(administrator=True)
     async def twitchrolesremove(self, ctx):
         """Removes all library roles."""
-        found = False
-        for role in ctx.guild.role_hierarchy:
-            if found and role:
-                await role.delete()
-
-            else:
-                if role.name == "Roles":
-                    found = True
+        roles = getLibRoles(ctx.guild)
+        for role in roles:
+            role.delete()
 
         await ctx.send(":thumbsup:")
 
     @commands.group(invoke_without_command=True, aliases=["role", "roles", "ranks"])
     async def rank(self, ctx):
+        """Handles user's library roles."""
         helpText = (await self.bot.formatter.format_help_for(ctx, self.rank))[0]
         await ctx.send(helpText)
 
     @rank.command(name="list")
     async def _list(self, ctx):
+        """Lists library roles."""
         roles = getLibRoles(ctx.guild)
 
         await ctx.send("All available roles are: `" + "`, `".join([r.name for r in roles]) + "`")
 
     @rank.command(name="join")
     async def _join(self, ctx, *, roleName):
+        """Allows the user to join a library role."""
         roles = getLibRoles(ctx.guild)
 
         role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
@@ -154,6 +226,7 @@ class Twitch:
 
     @rank.command(name="leave")
     async def _leave(self, ctx, *, roleName):
+        """Allows the user to leave a library role."""
         roles = getLibRoles(ctx.guild)
 
         role = discord.utils.find(lambda r: r.name.lower() == roleName.lower(), roles)
