@@ -140,14 +140,14 @@ class Twitch:
 
     @commands.command()
     @checks.has_permissions_owner(administrator=True)
-    async def addlib(self, ctx, channelName, lang, dev: discord.Member):
+    async def addlib(self, ctx, libNickName, lang, dev: discord.Member):
         """Adds a library channel."""
         category = discord.utils.find(lambda c: c.name.lower() == lang.lower(), ctx.guild.categories)
 
         if not category:
             category = await ctx.guild.create_category(lang)
 
-        channel = await ctx.guild.create_text_channel(channelName, category=category)
+        channel = await ctx.guild.create_text_channel(libNickName, category=category)
 
         permissions = discord.PermissionOverwrite()
         permissions.manage_channels = True
@@ -165,7 +165,7 @@ class Twitch:
         else:
             await dev.add_roles(libraryDevRole)
 
-        role = await ctx.guild.create_role(name=f"{lang}: {channelName}")
+        role = await ctx.guild.create_role(name=f"{lang}: {libNickName}")
         await asyncio.sleep(3)
 
         closeRoleTag = discord.utils.get(ctx.guild.roles, name="</roles>")
