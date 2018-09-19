@@ -1,6 +1,8 @@
-import aiohttp
 import json
 import logging
+
+import aiohttp
+
 import BotIDs
 
 log = logging.getLogger()
@@ -8,7 +10,6 @@ log = logging.getLogger()
 DISCORD_BOTS_API = "https://bots.discord.pw/api"
 
 if BotIDs.discord_pw_status:
-
     class Stats:
         # Cog for updating bots.discord.pw bot information.
         def __init__(self, bot):
@@ -19,7 +20,6 @@ if BotIDs.discord_pw_status:
             self.bot.loop.create_task(self.session.close())
 
         async def update(self):
-
             payload = json.dumps({
                 "server_count": len(self.bot.guilds)
             })
@@ -41,6 +41,7 @@ if BotIDs.discord_pw_status:
 
         async def on_ready(self):
             await self.update()
+
 
     def setup(bot):
         bot.add_cog(Stats(bot))

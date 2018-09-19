@@ -1,12 +1,13 @@
-from discord.ext import commands
+from contextlib import redirect_stdout
 import inspect
 import io
-from contextlib import redirect_stdout
 import textwrap
 import traceback
-import BotIDs
-import discord
+
+from discord.ext import commands
+
 import cogs.utils.checks as checks
+
 
 class Eval():
     def __init__(self, bot):
@@ -62,7 +63,7 @@ class Eval():
 
         await ctx.send("\n".join(lines))
 
-    @commands.command(name="exec", aliases = ["ex", "exed"], hidden=True)
+    @commands.command(name="exec", aliases=["ex", "exed"], hidden=True)
     @checks.is_dev()
     async def _exec(self, ctx, *, body: str):
         env = {
@@ -103,6 +104,7 @@ class Eval():
             else:
                 self._last_result = ret
                 await ctx.send(self.bot.blank + "```py\n%s%s\n```" % (value, ret))
+
 
 def setup(bot):
     bot.add_cog(Eval(bot))

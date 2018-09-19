@@ -2,5 +2,7 @@
   "clientID": "",
   "token": "",
   "ownerID": "",
-  "prefix": [""]
+  "prefix": [
+    ""
+  ]
 }

@@ -1,9 +1,9 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 
 import cogs.utils.checks as checks
-
-import asyncio
 
 
 async def twitchSort(ctx, *, message: discord.Message = None):
@@ -174,7 +174,7 @@ class Twitch:
 
         else:
             pos = closeRoleTag.position
-            await role.edit(position=pos+1)
+            await role.edit(position=pos + 1)
 
         m = await ctx.send("Starting sorting...")
 

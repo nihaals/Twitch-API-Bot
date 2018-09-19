@@ -1,10 +1,12 @@
 import json
-import os
 import logging
+import os
 from random import randint
+
 
 class InvalidFileIO(Exception):
     pass
+
 
 class DataIO():
     def __init__(self):
@@ -48,11 +50,11 @@ class DataIO():
 
     def _save_json(self, filename, data):
         with open(filename, encoding="utf-8", mode="w") as f:
-            json.dump(data, f, indent=4,sort_keys=True,
-                separators=(","," : "))
+            json.dump(data, f, indent=4, sort_keys=True,
+                      separators=(",", " : "))
         return data
 
-    def _legacy_fileio(self, filename, IO, data=None):
+    def _legacy_fileio(self, filename, IO, data = None):
         """Old fileIO provided for backwards compatibility"""
         if IO == "save" and data != None:
             return self.save_json(filename, data)
@@ -62,12 +64,14 @@ class DataIO():
             return self.is_valid_json(filename)
         else:
             raise InvalidFileIO("FileIO was called with invalid"
-                " parameters")
+                                " parameters")
+
 
 def get_value(filename, key):
     with open(filename, encoding="utf-8", mode="r") as f:
         data = json.load(f)
     return data[key]
+
 
 def set_value(filename, key, value):
     data = fileIO(filename, "load")
@@ -75,5 +79,6 @@ def set_value(filename, key, value):
     fileIO(filename, "save", data)
     return True
 
+
 dataIO = DataIO()
-fileIO = dataIO._legacy_fileio # backwards compatibility
+fileIO = dataIO._legacy_fileio  # backwards compatibility
