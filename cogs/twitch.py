@@ -123,7 +123,7 @@ def getLibRoles(guild: discord.Guild):
     """Returns a list of library roles."""
     roles = []
     foo = False
-    for role in guild.role_hierarchy:
+    for role in reversed(guild.roles):
         if role.name == "<roles>":
             foo = True
         elif role.name == "</roles>":
