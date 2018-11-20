@@ -206,9 +206,21 @@ class Twitch:
     @rank.command(name="list")
     async def _list(self, ctx):
         """Lists library roles."""
-        roles = getLibRoles(ctx.guild)
+        roles = {}
 
-        await ctx.send("All available roles are: `" + "`, `".join([r.name for r in roles]) + "`")
+        for role in getLibRoles(ctx.guild):
+            lang = role.name.split(': ')[0]
+
+            if not roles.get(lang, False):
+                roles[lang] = [role.name]
+            else:
+                roles[lang].append(role.name)
+
+        embed = discord.Embed(title='Available roles', colour=0x6441A4)
+        for lang in roles:
+            embed.add_field(name=lang, value='\n'.join(f'• {role_name}' for role_name in roles[lang]), inline=False)
+
+        await ctx.send(embed=embed)
 
     @rank.command(name="join")
     async def _join(self, ctx, *, roleName):
